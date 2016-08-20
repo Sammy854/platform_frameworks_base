@@ -71,6 +71,17 @@ public class ZenFooter extends LinearLayout {
         mSpTexts.add(mEndNowButton);
     }
 
+    private ZenModeController.Callback mZenModeCallback = new ZenModeController.Callback() {
+        @Override
+        public void onZenChanged(int zen) {
+            setZen(zen);
+        }
+        @Override
+        public void onConfigChanged(ZenModeConfig config) {
+            setConfig(config);
+        }
+    };
+    
     public void init(final ZenModeController controller) {
         controller.addCallback(new ZenModeController.Callback() {
             @Override

@@ -35,7 +35,7 @@ import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.volume.SegmentedButtons;
 
 /** Quick settings tile: Alert slider **/
-public class AlertSliderTile extends QSTile<QSTile.State>  {
+public class AlertSliderTile extends QSTile<QSTile.State> {
 
     private static final Intent ZEN_SETTINGS =
             new Intent(Settings.ACTION_ZEN_MODE_SETTINGS);
@@ -52,7 +52,7 @@ public class AlertSliderTile extends QSTile<QSTile.State>  {
     private final AlertSliderDetailAdapter mDetailAdapter;
 
     private boolean mListening;
-
+    
     public AlertSliderTile(Host host) {
         super(host, SPEC);
         mController = host.getZenModeController();

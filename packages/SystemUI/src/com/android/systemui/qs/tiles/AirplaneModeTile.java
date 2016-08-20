@@ -55,11 +55,17 @@ public class AirplaneModeTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
-    public void handleClick() {
+    protected void handleToggleClick() {
         MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
         setEnabled(!mState.value);
         mEnable.setAllowAnimation(true);
         mDisable.setAllowAnimation(true);
+    }
+
+    @Override
+    protected void handleDetailClick() {
+        // There are no additional details and we do not want to link this up to generic Settings.
+        handleToggleClick();
     }
 
     private void setEnabled(boolean enabled) {

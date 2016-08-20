@@ -59,7 +59,7 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
         if (ActivityManager.isUserAMonkey()) {
             return;
         }
@@ -67,6 +67,12 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
         boolean newState = !mState.value;
         refreshState(newState ? UserBoolean.USER_TRUE : UserBoolean.USER_FALSE);
         mFlashlightController.setFlashlight(newState);
+    }
+
+    @Override
+    protected void handleDetailClick() {
+        // TODO Consider implementing a detail view with configuration
+        handleToggleClick();
     }
 
     @Override

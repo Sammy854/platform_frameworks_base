@@ -94,12 +94,25 @@ public class WifiTile extends QSTile<QSTile.SignalState> {
     public QSTileView createTileView(Context context) {
         return new SignalTileView(context);
     }
-
+    
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
         mState.copyTo(mStateBeforeClick);
         MetricsLogger.action(mContext, getMetricsCategory(), !mState.enabled);
         mController.setWifiEnabled(!mState.enabled);
+    }
+
+    @Override
+    protected void handleDetailClick() {
+        if (!mWifiController.canConfigWifi()) {
+            mHost.startActivityDismissingKeyguard(new Intent(Settings.ACTION_WIFI_SETTINGS));
+            return;
+        }
+        if (!mState.enabled) {
+            mController.setWifiEnabled(true);
+            mState.enabled = true;
+        }
+        showDetail(true);
     }
 
     @Override

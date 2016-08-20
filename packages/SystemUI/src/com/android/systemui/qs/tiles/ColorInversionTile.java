@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -14,8 +15,11 @@
  * limitations under the License.
  */
 
+
 package com.android.systemui.qs.tiles;
 
+import android.content.Intent;
+import android.provider.Settings;
 import android.provider.Settings.Secure;
 
 import com.android.internal.logging.MetricsLogger;
@@ -86,13 +90,19 @@ public class ColorInversionTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
         MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
         mSetting.setValue(mState.value ? 0 : 1);
         mEnable.setAllowAnimation(true);
         mDisable.setAllowAnimation(true);
     }
 
+    @Override
+    protected void handleDetailClick() {
+        // There are no additional details and we do not want to link this up to Accessibility.
+        handleToggleClick();
+    }
+    
     @Override
     protected void handleLongClick() {
         if (mState.value) return;  // don't allow usage reset if inversion is active

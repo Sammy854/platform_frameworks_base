@@ -405,7 +405,11 @@ public class QsTuner extends Fragment implements Callback {
         }
 
         @Override
-        protected void handleClick() {
+        protected void handleToggleClick() {
+        }
+
+        @Override
+        protected void handleDetailClick() {
         }
 
         @Override

@@ -2465,27 +2465,11 @@
   <java-symbol type="string" name="theme_reset_notification_title" />
   <java-symbol type="string" name="theme_reset_notification_body" />
 
-  <!-- Non-themeable packages -->
-  <java-symbol type="array" name="non_themeable_packages" />
-
   <!-- First boot install dialog -->
   <java-symbol type="string" name="android_installing_apk" />
   <java-symbol type="string" name="android_installing_title" />
 
-  <!-- PA World Easter Egg -->
-  <java-symbol type="drawable" name="pa_world_logo" />
-
-  <!-- Package Manager -->
-  <java-symbol type="array" name="config_disabledComponents" />
-  <java-symbol type="array" name="config_forceEnabledComponents" />
-
   <!-- Power Menu (Global Actions) -->
-  <java-symbol type="array" name="shutdown_reboot_actions" />
-  <java-symbol type="array" name="shutdown_reboot_icons" />
-  <java-symbol type="array" name="shutdown_reboot_options" />
-  <java-symbol type="drawable" name="ic_lock_reboot_recovery" />
-  <java-symbol type="drawable" name="ic_lock_reboot_bootloader" />
-  <java-symbol type="drawable" name="ic_lock_screenshot" />
   <java-symbol type="drawable" name="ic_lock_power_reboot" />
   <java-symbol type="string" name="global_action_screenshot" />
   <java-symbol type="string" name="global_action_reboot" />
@@ -2495,12 +2479,6 @@
   <java-symbol type="string" name="reboot_bootloader" />
   <java-symbol type="string" name="reboot_confirm" />
   <java-symbol type="string" name="reboot_progress" />
-
-  <java-symbol type="layout" name="global_actions_separator" />
-  <java-symbol type="layout" name="global_actions_spacer" />
-  <java-symbol type="color" name="global_actions_separator" />
-  <java-symbol type="dimen" name="global_actions_dialog_width" />
-  <java-symbol type="dimen" name="global_actions_dialog_height" />
 
   <!-- Button Brightness -->
   <java-symbol type="integer" name="config_buttonBrightnessSettingMinimum" />

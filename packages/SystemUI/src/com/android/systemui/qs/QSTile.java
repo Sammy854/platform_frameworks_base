@@ -57,9 +57,11 @@ public abstract class QSTile<TState extends State> implements Listenable {
     protected static final boolean DEBUG = Log.isLoggable("QSTile", Log.DEBUG);
 
     protected final Host mHost;
+    protected final String mSpec;
     protected final Context mContext;
     protected final H mHandler;
     protected final Handler mUiHandler = new Handler(Looper.getMainLooper());
+    protected QSTileView mTileView;
 
     private Callback mCallback;
     protected TState mState = newTileState();
@@ -67,7 +69,10 @@ public abstract class QSTile<TState extends State> implements Listenable {
     private boolean mAnnounceNextStateChange;
 
     abstract protected TState newTileState();
-    abstract protected void handleClick();
+    /** Handles the user requesting a toggle action from the tile. */
+    abstract protected void handleToggleClick();
+    /** Handles the user requesting a detail view from the tile. */
+    abstract protected void handleDetailClick();
     abstract protected void handleUpdateState(TState state, Object arg);
 
     /**
@@ -79,22 +84,36 @@ public abstract class QSTile<TState extends State> implements Listenable {
      */
     abstract public int getMetricsCategory();
 
-    protected QSTile(Host host) {
+    protected QSTile(Host host, String spec) {
         mHost = host;
+        mSpec = spec;
         mContext = host.getContext();
         mHandler = new H(host.getLooper());
     }
 
-    public boolean supportsDualTargets() {
-        return false;
+    /**
+     * Returns whether dual targets are supported by this tile.
+     * As all tiles can be turned into dual-target tiles since
+     * implementing QS reordering, this call will always return
+     * true and has been deprecated.
+     *
+     * @deprecated
+     */
+    public final boolean supportsDualTargets() {
+        return true;
     }
 
     public Host getHost() {
         return mHost;
     }
 
+    public String getSpec() {
+        return mSpec;
+    }
+
     public QSTileView createTileView(Context context) {
-        return new QSTileView(context);
+        mTileView = new QSTileView(context);
+        return mTileView;
     }
 
     public DetailAdapter getDetailAdapter() {
@@ -116,8 +135,8 @@ public abstract class QSTile<TState extends State> implements Listenable {
         mHandler.obtainMessage(H.SET_CALLBACK, callback).sendToTarget();
     }
 
-    public void click() {
-        mHandler.sendEmptyMessage(H.CLICK);
+    public void click(boolean isDual) {
+        mHandler.obtainMessage(H.CLICK, isDual ? 1 : 0, 0).sendToTarget();
     }
 
     public void secondaryClick() {
@@ -175,8 +194,19 @@ public abstract class QSTile<TState extends State> implements Listenable {
         handleRefreshState(null);
     }
 
-    protected void handleSecondaryClick() {
-        // optional
+    private void handleClick(boolean isDual) {
+        if (isDual) {
+            // dual tiles have a regular and secondary click - regular is for toggles
+            handleToggleClick();
+        } else {
+            // non-dual tiles don't have a secondary click - regular is for details
+            handleDetailClick();
+        }
+    }
+
+    private void handleSecondaryClick() {
+        // this should only get called in dual tiles
+        handleDetailClick();
     }
 
     protected void handleLongClick() {
@@ -272,7 +302,7 @@ public abstract class QSTile<TState extends State> implements Listenable {
                 } else if (msg.what == CLICK) {
                     name = "handleClick";
                     mAnnounceNextStateChange = true;
-                    handleClick();
+                    handleClick(msg.arg1 != 0);
                 } else if (msg.what == SECONDARY_CLICK) {
                     name = "handleSecondaryClick";
                     handleSecondaryClick();
@@ -326,7 +356,8 @@ public abstract class QSTile<TState extends State> implements Listenable {
         void collapsePanels();
         Looper getLooper();
         Context getContext();
-        Collection<QSTile<?>> getTiles();
+        QSTile<?>[] getTiles();
+        QSTile<?>[] getHiddenTiles();
         void setCallback(Callback callback);
         BluetoothController getBluetoothController();
         LocationController getLocationController();
@@ -404,13 +435,14 @@ public abstract class QSTile<TState extends State> implements Listenable {
         @Override
         public Drawable getDrawable(Context context) {
             // workaround: get a clean state for every new AVD
-            final AnimatedVectorDrawable d = (AnimatedVectorDrawable) context.getDrawable(mResId)
-                    .getConstantState().newDrawable();
-            d.start();
-            if (mAllowAnimation) {
-                mAllowAnimation = false;
-            } else {
-                d.stop(); // skip directly to end state
+            final Drawable d = super.getDrawable(context).getConstantState().newDrawable();
+            if (d instanceof AnimatedVectorDrawable) {
+                ((AnimatedVectorDrawable)d).start();
+                if (mAllowAnimation) {
+                    mAllowAnimation = false;
+                } else {
+                    ((AnimatedVectorDrawable)d).stop(); // skip directly to end state
+                }
             }
             return d;
         }
@@ -500,8 +532,6 @@ public abstract class QSTile<TState extends State> implements Listenable {
         public int overlayIconId;
         public boolean filter;
         public boolean isOverlayIconWide;
-        public boolean isShowRoaming;
-        public int subId;
 
         @Override
         public boolean copyTo(State other) {
@@ -510,9 +540,7 @@ public abstract class QSTile<TState extends State> implements Listenable {
                     || o.connected != connected || o.activityIn != activityIn
                     || o.activityOut != activityOut
                     || o.overlayIconId != overlayIconId
-                    || o.isOverlayIconWide != isOverlayIconWide
-                    || o.isShowRoaming != isShowRoaming
-                    || o.subId != subId;
+                    || o.isOverlayIconWide != isOverlayIconWide;
             o.enabled = enabled;
             o.connected = connected;
             o.activityIn = activityIn;
@@ -520,8 +548,6 @@ public abstract class QSTile<TState extends State> implements Listenable {
             o.overlayIconId = overlayIconId;
             o.filter = filter;
             o.isOverlayIconWide = isOverlayIconWide;
-            o.isShowRoaming = isShowRoaming;
-            o.subId = subId;
             return super.copyTo(other) || changed;
         }
 
@@ -535,9 +561,6 @@ public abstract class QSTile<TState extends State> implements Listenable {
             rt.insert(rt.length() - 1, ",overlayIconId=" + overlayIconId);
             rt.insert(rt.length() - 1, ",filter=" + filter);
             rt.insert(rt.length() - 1, ",wideOverlayIcon=" + isOverlayIconWide);
-            rt.insert(rt.length() - 1, ",isShowRoaming=" + isShowRoaming);
-            rt.insert(rt.length() - 1, ",subId=" + subId);
-
             return rt;
         }
     }

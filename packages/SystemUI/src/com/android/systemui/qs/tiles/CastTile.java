@@ -85,7 +85,13 @@ public class CastTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
+        // TODO Consider adding a kill switch a la kill-all-connections-now
+        handleDetailClick();
+    }
+
+    @Override
+    protected void handleDetailClick() {
         MetricsLogger.action(mContext, getMetricsCategory());
         showDetail(true);
     }

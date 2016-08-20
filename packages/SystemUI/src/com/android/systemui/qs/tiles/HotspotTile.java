@@ -67,7 +67,7 @@ public class HotspotTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
         boolean airplaneMode = (Settings.Global.getInt(mContext.getContentResolver(),
                 Settings.Global.AIRPLANE_MODE_ON, 0) == 1);
         if (airplaneMode) {
@@ -79,11 +79,16 @@ public class HotspotTile extends QSTile<QSTile.BooleanState> {
             d.show();
             return;
         }
-        final boolean isEnabled = (Boolean) mState.value;
+        final boolean isEnabled = mState.value;
         MetricsLogger.action(mContext, getMetricsCategory(), !isEnabled);
         mController.setHotspotEnabled(!isEnabled);
         mEnable.setAllowAnimation(true);
         mDisable.setAllowAnimation(true);
+    }
+
+    @Override
+    protected void handleDetailClick() {
+        handleToggleClick();
     }
 
     @Override

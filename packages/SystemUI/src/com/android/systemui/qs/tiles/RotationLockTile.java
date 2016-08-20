@@ -58,12 +58,18 @@ public class RotationLockTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
         if (mController == null) return;
         MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
         final boolean newState = !mState.value;
         mController.setRotationLocked(newState);
         refreshState(newState ? UserBoolean.USER_TRUE : UserBoolean.USER_FALSE);
+    }
+
+    @Override
+    protected void handleDetailClick() {
+        // There are no additional details and we do not want to link this up to Display Settings.
+        handleToggleClick();
     }
 
     @Override

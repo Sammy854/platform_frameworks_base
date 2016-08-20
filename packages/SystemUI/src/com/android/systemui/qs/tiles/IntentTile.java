@@ -91,11 +91,16 @@ public class IntentTile extends QSTile<QSTile.State> {
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleToggleClick() {
         MetricsLogger.action(mContext, getMetricsCategory(), mIntentPackage);
         sendIntent("click", mOnClick, mOnClickUri);
     }
 
+    @Override
+    protected void handleDetailClick() {
+        sendIntent("long-click", mOnLongClick, mOnLongClickUri);
+    }
+    
     @Override
     protected void handleLongClick() {
         sendIntent("long-click", mOnLongClick, mOnLongClickUri);

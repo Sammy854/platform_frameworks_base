@@ -100,7 +100,7 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
     }
 
     @Override
-    public void handleClick() {
+    protected void handleToggleClick() {
         if (mController.isVolumeRestricted()) {
             // Collapse the panels, so the user can see the toast.
             mHost.collapsePanels();
@@ -109,16 +109,23 @@ public class DndTile extends QSTile<QSTile.BooleanState> {
                     Toast.LENGTH_LONG).show();
             return;
         }
+
         mDisable.setAllowAnimation(true);
         mDisableTotalSilence.setAllowAnimation(true);
         MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
         if (mState.value) {
             mController.setZen(Global.ZEN_MODE_OFF, null, TAG);
         } else {
-            int zen = Prefs.getInt(mContext, Prefs.Key.DND_FAVORITE_ZEN, Global.ZEN_MODE_ALARMS);
+            final int zen = Prefs.getInt(mContext,
+                    Prefs.Key.DND_FAVORITE_ZEN, Global.ZEN_MODE_ALARMS);
             mController.setZen(zen, null, TAG);
             showDetail(true);
         }
+    }
+
+    @Override
+    protected void handleDetailClick() {
+        showDetail(true);
     }
 
     @Override

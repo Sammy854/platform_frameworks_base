@@ -77,9 +77,20 @@ public class CellularTile extends QSTile<QSTile.SignalState> {
     public QSTileView createTileView(Context context) {
         return new SignalTileView(context);
     }
+    
+    @Override
+    protected void handleToggleClick() {
+        MetricsLogger.action(mContext, getMetricsCategory());
+        if (mDataController.isMobileDataSupported()) {
+            mDataController.setMobileDataEnabled(!mDataController.isMobileDataEnabled());
+        } else {
+            // We have nothing to toggle; just give the user the Settings app.
+            mHost.startActivityDismissingKeyguard(CELLULAR_SETTINGS);
+        }
+    }
 
     @Override
-    protected void handleClick() {
+    protected void handleDetailClick() {
         MetricsLogger.action(mContext, getMetricsCategory());
         if (mDataController.isMobileDataSupported()) {
             showDetail(true);
